@@ -1,5 +1,7 @@
+package com.siberteam.edu.zernest.ranker;
+
 public enum HandCombinations {
-    Highcard(0), Pair(1), TwoPairs(2), Three(3), Straight(4), Flush(5),
+    HighCard(0), Pair(1), TwoPairs(2), Three(3), Straight(4), Flush(5),
     FullHouse(6), Four(7), StraightFlush(8), RoyalFlush(9);
 
     private final int score;

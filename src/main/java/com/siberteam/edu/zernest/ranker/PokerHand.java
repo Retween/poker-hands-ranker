@@ -4,60 +4,54 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class PokerHand implements Comparable<PokerHand> {
-    private final List<Integer> values;
-    private final List<String> suits;
-    private final boolean flush;
-    private final boolean straight;
-    private final int highCard;
-    private final int uniqueValues;
+    private static final Map<String, Integer> cardValues = new HashMap<>();
+    private final HandCombinations combination;
+    private final String hand;
+    //    int highValue;
+    int totalValue;
 
-    public PokerHand(String hand) {
-        List<String> cards = new ArrayList<>(Arrays.asList(hand.split(" ")));
-
-        values = getValues(cards);
-        highCard = Collections.max(values);
-        straight = values.get(4) - values.get(0) == 4;
-        uniqueValues = (int) values.stream().distinct().count();
-
-        System.out.println(values.stream().distinct().collect(Collectors.toList()));
-        System.out.println(uniqueValues);
-        System.out.println(values.size());
-
-        suits = getSuits(cards);
-        flush = suits.stream().allMatch(suits.get(0)::equals);
+    static {
+        cardValues.put("T", 10);
+        cardValues.put("J", 11);
+        cardValues.put("Q", 12);
+        cardValues.put("K", 13);
+        cardValues.put("A", 14);
     }
 
-    public List<String> getSuits(List<String> cards) {
+    public PokerHand(String hand) {
+        this.hand = hand;
+        List<String> cards = new ArrayList<>(Arrays.asList(hand.split(" ")));
+
+        List<Integer> values = getValues(cards);
+//        highValue = Collections.max(values);
+        totalValue = values.stream().mapToInt(v -> v).sum();
+//        System.out.println(totalValue);
+        boolean straight = checkStraight(values);
+
+        List<String> suits = getSuits(cards);
+        boolean flush = suits.stream().allMatch(suits.get(0)::equals);
+
+        combination = findCombination(flush, straight, values);
+    }
+
+    private List<String> getSuits(List<String> cards) {
         List<String> list = new ArrayList<>(cards);
         list.replaceAll(s -> s.substring(1));
         return list;
     }
 
-    public List<Integer> getValues(List<String> cards) {
+    private List<Integer> getValues(List<String> cards) {
         List<String> values = new ArrayList<>(cards);
         values.replaceAll(s -> s.substring(0, 1));
 
         List<Integer> intValues = new ArrayList<>();
 
         for (String value : values) {
-            switch (value) {
-                case "T":
-                    intValues.add(10);
-                    break;
-                case "J":
-                    intValues.add(11);
-                    break;
-                case "Q":
-                    intValues.add(12);
-                    break;
-                case "K":
-                    intValues.add(13);
-                    break;
-                case "A":
-                    intValues.add(14);
-                    break;
-                default:
-                    intValues.add(Integer.parseInt(value));
+            Integer intValue = cardValues.get(value);
+            if (intValue != null) {
+                intValues.add((int) Math.pow(2, intValue));
+            } else {
+                intValues.add((int) Math.pow(2, Integer.parseInt(value)));
             }
         }
 
@@ -65,41 +59,110 @@ public class PokerHand implements Comparable<PokerHand> {
         return intValues;
     }
 
-    private int getScore() {
+    private HandCombinations findCombination(boolean flush, boolean straight, List<Integer> values) {
         if (flush && straight) {
-            return values.contains(14) ? 9 : 8;
+            return values.contains(cardValues.get("A")) ? HandCombinations.RoyalFlush
+                    : HandCombinations.StraightFlush;
+        } else if (flush) {
+            return HandCombinations.Flush;
+        } else if (straight) {
+            return HandCombinations.Straight;
         }
-        if (straight) {
-            return 4;
-        }
-        if (flush) {
-            return 5;
-        }
-        if (uniqueValues == 4) {
-            return 1;
-        }
-        if (uniqueValues == 3) {
-            return 2;
-        }
-        if (uniqueValues == 2) {
 
+        switch ((int) values.stream().distinct().count()) {
+            case 5:
+                return HandCombinations.HighCard;
+            case 4:
+                return HandCombinations.Pair;
+            case 3:
+                return getMaxDuplicatesCount(values) == 3 ? HandCombinations.Three
+                        : HandCombinations.TwoPairs;
+            case 2:
+                return getMaxDuplicatesCount(values) == 3 ? HandCombinations.FullHouse
+                        : HandCombinations.Four;
         }
-        return 0;
+
+        return HandCombinations.HighCard;
     }
 
-    public static void main(String[] args) {
-        PokerHand hand = new PokerHand("2S 1H KC KD KD");
-//        PokerHand hand = new PokerHand("2S 1H 1C KD KD");
+    private boolean checkStraight(List<Integer> values) {
+        boolean straigth = true;
+        for (int i = 1; i < values.size(); i++) {
+            if (!values.get(i).equals(values.get(i - 1) + 1)) {
+                straigth = false;
+                break;
+            }
+        }
+        return straigth;
+    }
 
-//        PokerHand hand = new PokerHand("2S 2H KC KD KD");
-//        PokerHand hand = new PokerHand("2S KH KC KD KD");
+    private int getMaxDuplicatesCount(List<Integer> values) {
+        int last = values.get(0);
+        int max = 0;
+        int current = 1;
 
-        System.out.println(hand.flush);
-        System.out.println(hand.straight);
+        for (int i = 1; i < values.size(); i++) {
+            if (values.get(i) == last) current++;
+            else {
+                max = Math.max(max, current);
+                current = 1;
+            }
+            last = values.get(i);
+        }
+
+        //        highValue = values.stream()
+//                .filter(value -> value.equals(Collections.max(values.stream()
+//                        .filter(v -> Collections.frequency(values, v) == maxDuplicatesCount)
+//                        .collect(Collectors.toList())
+//                )))
+//                .mapToInt(v -> v).sum();
+//
+//        System.out.println(highValue + " " + maxDuplicatesCount + " | " + hand);
+        return Math.max(max, current);
+    }
+
+    public HandCombinations getCombination() {
+        return combination;
+    }
+
+    public String getHand() {
+        return hand;
     }
 
     @Override
     public int compareTo(PokerHand o) {
+        int combinationComparing = Integer.compare(combination.getScore(), o.combination.getScore());
+        if (combinationComparing == 0) {
+
+        }
+        //        return combinationComparing == 0 ? Integer.compare(this.highValue, o.highValue) : combinationComparing;
         return 0;
+    }
+
+//    private int getCombinationsValues(List<Integer> values) {
+//
+//    }
+
+    @Override
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PokerHand hand1 = (PokerHand) o;
+        return combination == hand1.combination && hand.equals(hand1.hand);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(combination, hand);
+    }
+
+    @Override
+    public String toString() {
+        return "PokerHand" + "[" +
+                "combination=" + combination +
+                ", score=" + combination.getScore() +
+                ", hand=" + hand +
+                ']';
     }
 }
