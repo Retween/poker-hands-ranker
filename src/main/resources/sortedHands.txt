@@ -1,16 +1,16 @@
-3S 2H 5C JD TD: HighCard 2048
-KS 2H 5C JD TD: HighCard 8192
-TS KH JD QC AD: HighCard 16384
-3S 5H 5C JD TD: Pair 2048
-2H 3H 3S KD QS: Pair 8192
-2S 6H 6C 4D 4H: TwoPairs 64
-2S 3H 3C KD KH: TwoPairs 8192
-JS JD JH 7H 8S: Three 2048
-2S 7H KC KD KH: Three 8192
-2S 4H KC KH KD: Three 8192
-TS JS 9S KS QS: Flush 8192
-2C 3C AC 4C 5C: Flush 16384
-JH 3H AH 8H TH: Flush 16384
-TS JS AS KS QS: Flush 16384
-2S KH KC KD KS: Four 8192
-AS JH JC JD JS: Four 16384
+3S 2H 5C JD TD: HighCard
+KS 2H 5C JD TD: HighCard
+3S 5H 5C JD TD: Pair
+2H 3H 3S KD QS: Pair
+2S 6H 6C 4D 4H: TwoPairs
+2S 3H 3C KD KH: TwoPairs
+JS JD JH 7H 8S: Three
+2S 7H KC KD KH: Three
+TS KH JD QC AD: Straight
+2C 3C AC 4C 5C: Flush
+JH 3H AH 8H TH: Flush
+2S 4H KC KH KD: Three
+AS JH JC JD JS: Four
+2S KH KC KD KS: Four
+TS JS 9S KS QS: StraightFlush
+TS JS AS KS QS: RoyalFlush
