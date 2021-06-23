@@ -13,4 +13,12 @@ public enum HandCombinations {
     public int getScore() {
         return score;
     }
+
+    @Override
+    public String toString() {
+        return "HandCombinations" + "[" +
+                "Combination:" + this.name() +
+                ", score=" + score +
+                ']';
+    }
 }

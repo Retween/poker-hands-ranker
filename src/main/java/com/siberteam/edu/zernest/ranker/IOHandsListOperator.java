@@ -22,7 +22,7 @@ public class IOHandsListOperator {
     public static void writeHandsList(OutputStream outputStream, List<PokerHand> hands) throws IOException {
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream))) {
             for (PokerHand hand : hands) {
-                bw.write(hand.getHand() + ": " + hand.getCombination() + "\n");
+                bw.write(hand.getHand() + ": " + hand.getCombination().name() + "\n");
             }
         }
     }
