@@ -29,9 +29,9 @@ public class CommandLineParser {
             throw new FileNotFoundException(inputFile.getName());
         }
 
-        if (outputFile.exists() && outputFile.isFile()) {
-            throw new FileAlreadyExistsException(outputFile.getName());
-        }
+//        if (outputFile.exists() && outputFile.isFile()) {
+//            throw new FileAlreadyExistsException(outputFile.getName());
+//        }
 
         inputStream = new FileInputStream(inputFile);
         outputStream = new FileOutputStream(outputFile);

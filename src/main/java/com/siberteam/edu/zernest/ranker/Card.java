@@ -12,16 +12,17 @@ public class Card {
         rank = RANKS.indexOf(card.charAt(0));
         suit = SUITS.indexOf(card.charAt(1));
         if (rank == -1 || suit == -1 || card.length() != 2) {
-            throw new IllegalArgumentException("Invalid card");
+            throw new IllegalArgumentException("Invalid card: " + card);
         }
+    }
+
+    public static int getRank(char rank) {
+        int result = RANKS.indexOf(rank);
+        return (result == -1) ? -1 : result + ADDITION;
     }
 
     public int getRank() {
         return rank + ADDITION;
-    }
-
-    public static int getRank(char rank) {
-        return RANKS.indexOf(rank) + ADDITION;
     }
 
     public int getSuit() {

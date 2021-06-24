@@ -21,6 +21,7 @@ public class Main {
             List<PokerHand> hands = IOHandsListOperator.readHandsList(parser.getInputStream());
 
             Collections.sort(hands);
+            System.out.println(Card.getRank('s'));
 
             IOHandsListOperator.writeHandsList(parser.getOutputStream(), hands);
         } catch (Exception e) {
