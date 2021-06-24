@@ -12,11 +12,11 @@ public class PokerHand implements Comparable<PokerHand> {
         List<Card> cardsList = getCardsHand(hand);
         List<Integer> ranks = getRanks(cardsList);
         List<Integer> suits = getSuits(cardsList);
-        int maxDuplicatesCount = getMaxDuplicatesCount(ranks);
+        int maxDuplicatesCount = findMaxDuplicatesCount(ranks);
 
-        combination = findCombination(checkFlush(suits), checkStraight(ranks), maxDuplicatesCount, ranks);
+        combination = findCombination(isFlush(suits), isStraight(ranks), maxDuplicatesCount, ranks);
 
-        sameCombinationScore = getSameCombinationScore(getRanksMap(ranks), maxDuplicatesCount);
+        sameCombinationScore = findSameCombinationScore(getRanksMap(ranks), maxDuplicatesCount);
     }
 
     private List<Card> getCardsHand(String stringHand) {
@@ -42,6 +42,41 @@ public class PokerHand implements Comparable<PokerHand> {
         Map<Integer, Integer> ranksMap = new LinkedHashMap<>();
         ranks.forEach(rank -> ranksMap.merge(rank, 1, Integer::sum));
         return ranksMap;
+    }
+
+    private boolean isStraight(List<Integer> ranks) {
+        boolean straight = true;
+
+        for (int i = 1; i < ranks.size(); i++) {
+            if (!ranks.get(i).equals(ranks.get(i - 1) + 1)) {
+                straight = false;
+                break;
+            }
+        }
+
+        return straight;
+    }
+
+    private boolean isFlush(List<Integer> suits) {
+        return suits.stream().allMatch(suits.get(0)::equals);
+    }
+
+    private int findMaxDuplicatesCount(List<Integer> values) {
+        int last = values.get(0);
+        int max = 0;
+        int current = 1;
+
+        for (int i = 1; i < values.size(); i++) {
+            if (values.get(i) == last) {
+                current++;
+            } else {
+                max = Math.max(max, current);
+                current = 1;
+            }
+            last = values.get(i);
+        }
+
+        return Math.max(max, current);
     }
 
     private HandCombinations findCombination(boolean flush, boolean straight, int maxDuplicatesCount,
@@ -71,42 +106,7 @@ public class PokerHand implements Comparable<PokerHand> {
         return HandCombinations.HighCard;
     }
 
-    private boolean checkStraight(List<Integer> ranks) {
-        boolean straight = true;
-
-        for (int i = 1; i < ranks.size(); i++) {
-            if (!ranks.get(i).equals(ranks.get(i - 1) + 1)) {
-                straight = false;
-                break;
-            }
-        }
-
-        return straight;
-    }
-
-    private boolean checkFlush(List<Integer> suits) {
-        return suits.stream().allMatch(suits.get(0)::equals);
-    }
-
-    private int getMaxDuplicatesCount(List<Integer> values) {
-        int last = values.get(0);
-        int max = 0;
-        int current = 1;
-
-        for (int i = 1; i < values.size(); i++) {
-            if (values.get(i) == last) {
-                current++;
-            } else {
-                max = Math.max(max, current);
-                current = 1;
-            }
-            last = values.get(i);
-        }
-
-        return Math.max(max, current);
-    }
-
-    private long getSameCombinationScore(Map<Integer, Integer> ranksMap, int maxDuplicatesCount) {
+    private long findSameCombinationScore(Map<Integer, Integer> ranksMap, int maxDuplicatesCount) {
         StringBuilder sameCombinationScore = new StringBuilder();
         int max = 0;
 
