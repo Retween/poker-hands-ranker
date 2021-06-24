@@ -1,5 +1,5 @@
 import com.siberteam.edu.zernest.ranker.HandCombinations;
-import com.siberteam.edu.zernest.ranker.IOHandsListOperator;
+import com.siberteam.edu.zernest.ranker.Test.IOHandsListOperator;
 import com.siberteam.edu.zernest.ranker.PokerHand;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,15 +51,15 @@ public class PokerHandTest {
 
     @Test
     public void findCombinationTest() {
-        Assert.assertEquals(HandCombinations.HighCard, new PokerHand("3S 2H 5C JD TD").getCombination());
-        Assert.assertEquals(HandCombinations.Pair, new PokerHand("2H 3H 3S KD QS").getCombination());
-        Assert.assertEquals(HandCombinations.TwoPairs, new PokerHand("2S 3H 3C KD KH").getCombination());
-        Assert.assertEquals(HandCombinations.Three, new PokerHand("2S 3H KC KD KH").getCombination());
-        Assert.assertEquals(HandCombinations.Straight, new PokerHand("TS KH JD QC AD").getCombination());
-        Assert.assertEquals(HandCombinations.Flush, new PokerHand("2C 3C AC 4C 5C").getCombination());
-        Assert.assertEquals(HandCombinations.FullHouse, new PokerHand("2S 2H KC KH KD").getCombination());
-        Assert.assertEquals(HandCombinations.Four, new PokerHand("2S KH KC KD KS").getCombination());
-        Assert.assertEquals(HandCombinations.StraightFlush, new PokerHand("TS JS 9S KS QS").getCombination());
-        Assert.assertEquals(HandCombinations.RoyalFlush, new PokerHand("TS JS AS KS QS").getCombination());
+        Assert.assertEquals(HandCombinations.HIGH_CARD, new PokerHand("3S 2H 5C JD TD").getCombination());
+        Assert.assertEquals(HandCombinations.PAIR, new PokerHand("2H 3H 3S KD QS").getCombination());
+        Assert.assertEquals(HandCombinations.TWO_PAIRS, new PokerHand("2S 3H 3C KD KH").getCombination());
+        Assert.assertEquals(HandCombinations.THREE, new PokerHand("2S 3H KC KD KH").getCombination());
+        Assert.assertEquals(HandCombinations.STRAIGHT, new PokerHand("TS KH JD QC AD").getCombination());
+        Assert.assertEquals(HandCombinations.FLUSH, new PokerHand("2C 3C AC 4C 5C").getCombination());
+        Assert.assertEquals(HandCombinations.FULL_HOUSE, new PokerHand("2S 2H KC KH KD").getCombination());
+        Assert.assertEquals(HandCombinations.FOUR, new PokerHand("2S KH KC KD KS").getCombination());
+        Assert.assertEquals(HandCombinations.STRAIGHT_FLUSH, new PokerHand("TS JS 9S KS QS").getCombination());
+        Assert.assertEquals(HandCombinations.ROYAL_FLUSH, new PokerHand("TS JS AS KS QS").getCombination());
     }
 }

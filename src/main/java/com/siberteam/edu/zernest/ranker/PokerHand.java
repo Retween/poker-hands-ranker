@@ -82,28 +82,28 @@ public class PokerHand implements Comparable<PokerHand> {
     private HandCombinations findCombination(boolean flush, boolean straight, int maxDuplicatesCount,
                                              List<Integer> values) {
         if (flush && straight) {
-            return values.contains(Card.getRank('A')) ? HandCombinations.RoyalFlush
-                    : HandCombinations.StraightFlush;
+            return values.contains(Card.getRank('A')) ? HandCombinations.ROYAL_FLUSH
+                    : HandCombinations.STRAIGHT_FLUSH;
         } else if (flush) {
-            return HandCombinations.Flush;
+            return HandCombinations.FLUSH;
         } else if (straight) {
-            return HandCombinations.Straight;
+            return HandCombinations.STRAIGHT;
         }
 
         switch ((int) values.stream().distinct().count()) {
             case 5:
-                return HandCombinations.HighCard;
+                return HandCombinations.HIGH_CARD;
             case 4:
-                return HandCombinations.Pair;
+                return HandCombinations.PAIR;
             case 3:
-                return maxDuplicatesCount == 3 ? HandCombinations.Three
-                        : HandCombinations.TwoPairs;
+                return maxDuplicatesCount == 3 ? HandCombinations.THREE
+                        : HandCombinations.TWO_PAIRS;
             case 2:
-                return maxDuplicatesCount == 3 ? HandCombinations.FullHouse
-                        : HandCombinations.Four;
+                return maxDuplicatesCount == 3 ? HandCombinations.FULL_HOUSE
+                        : HandCombinations.FOUR;
         }
 
-        return HandCombinations.HighCard;
+        return HandCombinations.HIGH_CARD;
     }
 
     private long findSameCombinationScore(Map<Integer, Integer> ranksMap, int maxDuplicatesCount) {

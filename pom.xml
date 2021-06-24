@@ -33,7 +33,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>dependencies</classpathPrefix>
                             <mainClass>
-                                com.siberteam.edu.zernest.ranker.Main
+                                com.siberteam.edu.zernest.ranker.Test.Main
                             </mainClass>
                         </manifest>
                     </archive>
