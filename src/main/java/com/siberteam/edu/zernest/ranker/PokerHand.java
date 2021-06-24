@@ -146,11 +146,9 @@ public class PokerHand implements Comparable<PokerHand> {
     @Override
     public int compareTo(PokerHand o) {
         int combinationComparing = Integer.compare(combination.getScore(), o.combination.getScore());
-        if (combinationComparing == 0) {
-            return Long.compare(getSameCombinationScore(), o.getSameCombinationScore());
-        } else {
-            return combinationComparing;
-        }
+
+        return combinationComparing == 0 ? Long.compare(getSameCombinationScore(), o.getSameCombinationScore())
+                : combinationComparing;
     }
 
     @Override
