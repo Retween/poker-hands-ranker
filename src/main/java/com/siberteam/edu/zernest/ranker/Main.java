@@ -25,7 +25,6 @@ public class Main {
             IOHandsListOperator.writeHandsList(parser.getOutputStream(), hands);
         } catch (Exception e) {
             parser.printHelp();
-            e.printStackTrace();
             errorHandler.handleException(e);
         }
     }
