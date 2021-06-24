@@ -1,65 +1,452 @@
-import com.siberteam.edu.zernest.ranker.HandCombinations;
-import com.siberteam.edu.zernest.ranker.Test.IOHandsListOperator;
-import com.siberteam.edu.zernest.ranker.PokerHand;
+import com.siberteam.edu.zernest.ranker.*;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.omg.CORBA.PUBLIC_MEMBER;
 
 public class PokerHandTest {
-    List<PokerHand> expectedHandsList;
-    List<PokerHand> actualHansList;
 
-    @Before
-    public void setUp() throws IOException {
-        File file = new File("src/test/data/testHands.txt");
-
-        actualHansList = IOHandsListOperator.readHandsList(new FileInputStream(file));
-        Collections.sort(actualHansList);
-
-        expectedHandsList = new ArrayList<>();
-        expectedHandsList.add(new PokerHand("3S 2H 5C JD TD"));//HighCard
-        expectedHandsList.add(new PokerHand("4S 2H 5C JD TD"));//HighCard
-        expectedHandsList.add(new PokerHand("2H 3H 3S KD QS"));//Pair
-        expectedHandsList.add(new PokerHand("5H 3S 3H KD QS"));//Pair
-        expectedHandsList.add(new PokerHand("2S 3H 3C KD KH"));//TwoPairs
-        expectedHandsList.add(new PokerHand("9S 3H 3C KD KH"));//TwoPairs
-        expectedHandsList.add(new PokerHand("2S 3H KC KD KH"));//Three
-        expectedHandsList.add(new PokerHand("9S 3H KC KD KH"));//Three
-        expectedHandsList.add(new PokerHand("2S 3H 4D 5C 6D"));//Straight
-        expectedHandsList.add(new PokerHand("TS KH JD QC AD"));//Straight
-        expectedHandsList.add(new PokerHand("2C 3C AC 4C 5C"));//Flush
-        expectedHandsList.add(new PokerHand("2C QC AC KC 5C"));//Flush
-        expectedHandsList.add(new PokerHand("2S 2H KC KH KD"));//FullHouse
-        expectedHandsList.add(new PokerHand("AS AH KC KH KD"));//FullHouse
-        expectedHandsList.add(new PokerHand("2S KH KC KD KS"));//Four
-        expectedHandsList.add(new PokerHand("4S KH KC KD KS"));//Four
-        expectedHandsList.add(new PokerHand("TS JS 9S KS QS"));//StraightFlush
-        expectedHandsList.add(new PokerHand("TS JS KS AS QS"));//RoyalFlush
+    @Test
+    public void compareSameCards() {
+        Assert.assertEquals(new Card("2H"), new Card(Rank.TWO, Suit.HEARTS));
+        Assert.assertEquals(new Card("AC"), new Card(Rank.ACE, Suit.CLUBS));
+        Assert.assertEquals(new Card("TD"), new Card(Rank.TEN, Suit.DIAMONDS));
+        Assert.assertEquals(new Card("JS"), new Card(Rank.JACK, Suit.SPADES));
+        Assert.assertEquals(new Card("KH"), new Card(Rank.KING, Suit.HEARTS));
     }
 
     @Test
-    public void sortHandsTest() {
-        Assert.assertEquals(expectedHandsList, actualHansList);
+    public void compareSameHandsWithDifferentOrder() {
+        Assert.assertEquals(new PokerHand("TS JS AS KS QS"), new PokerHand("QS JS TS AS KS"));
+        Assert.assertEquals(new PokerHand("KC KH KD 2S KS"), new PokerHand("2S KH KC KD KS"));
+        Assert.assertEquals(new PokerHand("TS JS AS KS QS"), new PokerHand("KS QS TS JS AS"));
+        Assert.assertEquals(new PokerHand("2S KC 2H KH KD"), new PokerHand("2S 2H KC KH KD"));
+        Assert.assertEquals(new PokerHand("3S 2H 5C JD TD"), new PokerHand("TD JD 5C 3S 2H"));
     }
 
     @Test
-    public void findCombinationTest() {
+    public void findHighCardCombination() {
         Assert.assertEquals(HandCombinations.HIGH_CARD, new PokerHand("3S 2H 5C JD TD").getCombination());
-        Assert.assertEquals(HandCombinations.PAIR, new PokerHand("2H 3H 3S KD QS").getCombination());
-        Assert.assertEquals(HandCombinations.TWO_PAIRS, new PokerHand("2S 3H 3C KD KH").getCombination());
-        Assert.assertEquals(HandCombinations.THREE, new PokerHand("2S 3H KC KD KH").getCombination());
-        Assert.assertEquals(HandCombinations.STRAIGHT, new PokerHand("TS KH JD QC AD").getCombination());
-        Assert.assertEquals(HandCombinations.FLUSH, new PokerHand("2C 3C AC 4C 5C").getCombination());
-        Assert.assertEquals(HandCombinations.FULL_HOUSE, new PokerHand("2S 2H KC KH KD").getCombination());
-        Assert.assertEquals(HandCombinations.FOUR, new PokerHand("2S KH KC KD KS").getCombination());
-        Assert.assertEquals(HandCombinations.STRAIGHT_FLUSH, new PokerHand("TS JS 9S KS QS").getCombination());
-        Assert.assertEquals(HandCombinations.ROYAL_FLUSH, new PokerHand("TS JS AS KS QS").getCombination());
+        Assert.assertEquals(HandCombinations.HIGH_CARD, new PokerHand("5D 2C TH JC QS").getCombination());
+        Assert.assertEquals(HandCombinations.HIGH_CARD, new PokerHand("KH 7C 5H 4D 2S").getCombination());
+        Assert.assertEquals(HandCombinations.HIGH_CARD, new PokerHand("AD QH 9H 5C 3D").getCombination());
+        Assert.assertEquals(HandCombinations.HIGH_CARD, new PokerHand("JC TS 7H 6S 2H").getCombination());
     }
+
+    @Test
+    public void findPairCombination() {
+        Assert.assertEquals(HandCombinations.PAIR, new PokerHand("2H 3H 3S KD QS").getCombination());
+        Assert.assertEquals(HandCombinations.PAIR, new PokerHand("AC AH JS 7C 4S").getCombination());
+        Assert.assertEquals(HandCombinations.PAIR, new PokerHand("QD QH KH TC 2D").getCombination());
+        Assert.assertEquals(HandCombinations.PAIR, new PokerHand("8S 8C AD JD 9D").getCombination());
+        Assert.assertEquals(HandCombinations.PAIR, new PokerHand("2H 2S TH 8C 4D").getCombination());
+    }
+
+    @Test
+    public void findTwoPairCombination() {
+        Assert.assertEquals(HandCombinations.TWO_PAIRS, new PokerHand("2S 3H 3C KD KH").getCombination());
+        Assert.assertEquals(HandCombinations.TWO_PAIRS, new PokerHand("AS AD QC QD 5H").getCombination());
+        Assert.assertEquals(HandCombinations.TWO_PAIRS, new PokerHand("JC JH 8S 8H AC").getCombination());
+        Assert.assertEquals(HandCombinations.TWO_PAIRS, new PokerHand("9H 9D 5D 5C KD").getCombination());
+        Assert.assertEquals(HandCombinations.TWO_PAIRS, new PokerHand("6C 6H 2D 2C TC").getCombination());
+    }
+
+    @Test
+    public void findThreeCombination() {
+        Assert.assertEquals(HandCombinations.THREE, new PokerHand("2S 3H KC KD KH").getCombination());
+        Assert.assertEquals(HandCombinations.THREE, new PokerHand("AS AC AD JH 4C").getCombination());
+        Assert.assertEquals(HandCombinations.THREE, new PokerHand("QH QD QS AD 8D").getCombination());
+        Assert.assertEquals(HandCombinations.THREE, new PokerHand("9C 9S 9H KH 7C").getCombination());
+        Assert.assertEquals(HandCombinations.THREE, new PokerHand("2D 2S 2C JH TS").getCombination());
+    }
+
+    @Test
+    public void findStraightCombination() {
+        Assert.assertEquals(HandCombinations.STRAIGHT, new PokerHand("TS KH JD QC AD").getCombination());
+        Assert.assertEquals(HandCombinations.STRAIGHT, new PokerHand("AH KD QS JH TC").getCombination());
+        Assert.assertEquals(HandCombinations.STRAIGHT, new PokerHand("QD JC TH 9H 8S").getCombination());
+        Assert.assertEquals(HandCombinations.STRAIGHT, new PokerHand("7H 6C 5H 4D 3C").getCombination());
+        Assert.assertEquals(HandCombinations.STRAIGHT, new PokerHand("4C 5C 3H 2D 6H").getCombination());
+    }
+
+    @Test
+    public void findFlushCombination() {
+        Assert.assertEquals(HandCombinations.FLUSH, new PokerHand("2C 3C AC 4C 5C").getCombination());
+        Assert.assertEquals(HandCombinations.FLUSH, new PokerHand("AD QD TD 7D 4D").getCombination());
+        Assert.assertEquals(HandCombinations.FLUSH, new PokerHand("JS 9S 8S 4S 3S").getCombination());
+        Assert.assertEquals(HandCombinations.FLUSH, new PokerHand("TH 7H 4H 3H 2H").getCombination());
+        Assert.assertEquals(HandCombinations.FLUSH, new PokerHand("8C 7C 5C 4C 3C").getCombination());
+    }
+
+    @Test
+    public void findFullHouseCombination() {
+        Assert.assertEquals(HandCombinations.FULL_HOUSE, new PokerHand("2S 2H KC KH KD").getCombination());
+        Assert.assertEquals(HandCombinations.FULL_HOUSE, new PokerHand("AS AH AC QH QD").getCombination());
+        Assert.assertEquals(HandCombinations.FULL_HOUSE, new PokerHand("JD JC JS 2S 2H").getCombination());
+        Assert.assertEquals(HandCombinations.FULL_HOUSE, new PokerHand("TC TS TH AD AS").getCombination());
+        Assert.assertEquals(HandCombinations.FULL_HOUSE, new PokerHand("4H 4S 4D KS KH").getCombination());
+    }
+
+    @Test
+    public void findFourCombination() {
+        Assert.assertEquals(HandCombinations.FOUR, new PokerHand("2S KH KC KD KS").getCombination());
+        Assert.assertEquals(HandCombinations.FOUR, new PokerHand("AS AH AC AD 5C").getCombination());
+        Assert.assertEquals(HandCombinations.FOUR, new PokerHand("JS JC JD JH 9H").getCombination());
+        Assert.assertEquals(HandCombinations.FOUR, new PokerHand("7D 7S 7H 7C KD").getCombination());
+        Assert.assertEquals(HandCombinations.FOUR, new PokerHand("4S 4D 4H 4C TD").getCombination());
+    }
+
+    @Test
+    public void findStraightFlushCombination() {
+        Assert.assertEquals(HandCombinations.STRAIGHT_FLUSH, new PokerHand("TS JS 9S KS QS").getCombination());
+        Assert.assertEquals(HandCombinations.STRAIGHT_FLUSH, new PokerHand("KS QS JS TS 9S").getCombination());
+        Assert.assertEquals(HandCombinations.STRAIGHT_FLUSH, new PokerHand("9H 8H 7H 6H 5H").getCombination());
+        Assert.assertEquals(HandCombinations.STRAIGHT_FLUSH, new PokerHand("QC JC TC 9C 8C").getCombination());
+        Assert.assertEquals(HandCombinations.STRAIGHT_FLUSH, new PokerHand("5D 6D 4D 3D 2D").getCombination());
+    }
+
+    @Test
+    public void findRoyalFlushCombination() {
+        Assert.assertEquals(HandCombinations.ROYAL_FLUSH, new PokerHand("TS JS AS KS QS").getCombination());
+        Assert.assertEquals(HandCombinations.ROYAL_FLUSH, new PokerHand("AS KS QS JS TS").getCombination());
+        Assert.assertEquals(HandCombinations.ROYAL_FLUSH, new PokerHand("AH KH QH JH TH").getCombination());
+        Assert.assertEquals(HandCombinations.ROYAL_FLUSH, new PokerHand("AC KC QC JC TC").getCombination());
+        Assert.assertEquals(HandCombinations.ROYAL_FLUSH, new PokerHand("AD KD QD JD TD").getCombination());
+    }
+
+    @Test
+    public void compareHighCardCombinations() {
+        Assert.assertEquals(0, new PokerHand("AD QH 9H 5C 3D").compareTo(new PokerHand("AC QD 9D 5D 3C")));
+        Assert.assertEquals(1, new PokerHand("AD QH 9H 5C 3D").compareTo(new PokerHand("2C QD 9D 5D 3C")));
+        Assert.assertEquals(1, new PokerHand("KH 7C 6H 4D 2S").compareTo(new PokerHand("JC TS 7H 6S 2H")));
+        Assert.assertEquals(1, new PokerHand("JC TS 7H 6S 2H").compareTo(new PokerHand("9C 8D 7D 6D 4D")));
+    }
+
+    @Test
+    public void comparePairCombinations() {
+        Assert.assertEquals(0, new PokerHand("2H 3H 3S KD QS").compareTo(new PokerHand("2S 3C 3D KH QD")));
+        Assert.assertEquals(1, new PokerHand("QD QH KH TC 2D").compareTo(new PokerHand("JD JH KH TC 2D")));
+        Assert.assertEquals(1, new PokerHand("8S 8C AD JD 9D").compareTo(new PokerHand("8S 8C KD JD 9D")));
+        Assert.assertEquals(1, new PokerHand("AC AH JS 7C 4S").compareTo(new PokerHand("AD AC JH 7C 3S")));
+    }
+
+    @Test
+    public void compareTwoPairCombinations() {
+        Assert.assertEquals(0, new PokerHand("2S 3H 3C KD KH").compareTo(new PokerHand("2H KC KH 3D 3C")));
+        Assert.assertEquals(1, new PokerHand("AS AD QC QD 5H").compareTo(new PokerHand("3S 3D 2C 2D 5H")));
+        Assert.assertEquals(1, new PokerHand("JC JH 8S 8H AC").compareTo(new PokerHand("JD JC 4C 4D AC")));
+        Assert.assertEquals(1, new PokerHand("9H 9D 5D 5C KD").compareTo(new PokerHand("9S 9C 5D 5H JD")));
+    }
+
+    @Test
+    public void compareThreeCombinations() {
+        Assert.assertEquals(0, new PokerHand("AS AC AD JH 4C").compareTo(new PokerHand("AC AS AH JC 4D")));
+        Assert.assertEquals(1, new PokerHand("QH QD QS AD 8D").compareTo(new PokerHand("3H 3D 3S 4D KD")));
+        Assert.assertEquals(1, new PokerHand("9C 9S 9H KH 7C").compareTo(new PokerHand("9D 9S 9H JD TC")));
+        Assert.assertEquals(1, new PokerHand("2D 2S 2C JH TS").compareTo(new PokerHand("2D 2S 2C JH 9C")));
+    }
+
+    @Test
+    public void compareStraightCombinations() {
+        Assert.assertEquals(0, new PokerHand("AH KD QS JH TC").compareTo(new PokerHand("AD KD QD JS TC")));
+        Assert.assertEquals(1, new PokerHand("QD JC TH 9H 8S").compareTo(new PokerHand("2D 4C 3H 6H 5S")));
+        Assert.assertEquals(1, new PokerHand("7H 6C 5H 4D 3C").compareTo(new PokerHand("2D 6H 5S 4D 3S")));
+        Assert.assertEquals(1, new PokerHand("AH KD QS JH TC").compareTo(new PokerHand("4C 5C 3H 2D 6H")));
+    }
+
+    @Test
+    public void compareFlushCombinations() {
+        Assert.assertEquals(0, new PokerHand("AD QD TD 7D 4D").compareTo(new PokerHand("AC QC TC 7C 4C")));
+        Assert.assertEquals(0, new PokerHand("JS 9S 8S 4S 3S").compareTo(new PokerHand("JH 9H 8H 4H 3H")));
+        Assert.assertEquals(1, new PokerHand("TH 7H 4H 3H 2H").compareTo(new PokerHand("5H 7H 4H 3H 2H")));
+        Assert.assertEquals(1, new PokerHand("AD QD TD 7D 4D").compareTo(new PokerHand("8C 7C 5C 4C 3C")));
+    }
+
+    @Test
+    public void compareFullHouseCombinations() {
+        Assert.assertEquals(0, new PokerHand("2S 2H KC KH KD").compareTo(new PokerHand("2D 2C KS KH KD")));
+        Assert.assertEquals(1, new PokerHand("AS AH AC QH QD").compareTo(new PokerHand("KS KD KC QS QD")));
+        Assert.assertEquals(1, new PokerHand("JD JC JH AC AD").compareTo(new PokerHand("JD JC JS 2S 2H")));
+        Assert.assertEquals(1, new PokerHand("TC TS TH AD AS").compareTo(new PokerHand("5C 5S 5H AD AS")));
+    }
+
+    @Test
+    public void compareFourCombinations() {
+        Assert.assertEquals(0, new PokerHand("2S KH KC KD KS").compareTo(new PokerHand("2D KH KC KD KS")));
+        Assert.assertEquals(1, new PokerHand("AS AH AC AD 5C").compareTo(new PokerHand("KS KH KC KD AC")));
+        Assert.assertEquals(1, new PokerHand("JS JC JD JH 9H").compareTo(new PokerHand("TS TC TD TH 9H")));
+        Assert.assertEquals(1, new PokerHand("7D 7S 7H 7C KD").compareTo(new PokerHand("2D 2S 2H 2C AD")));
+    }
+
+    @Test
+    public void compareStraightFlushCombinations() {
+        Assert.assertEquals(0, new PokerHand("TS JS 9S KS QS").compareTo(new PokerHand("TH JH 9H KH QH")));
+        Assert.assertEquals(1, new PokerHand("KS QS JS TS 9S").compareTo(new PokerHand("8C QC JC TC 9C")));
+        Assert.assertEquals(1, new PokerHand("9H 8H 7H 6H 5H").compareTo(new PokerHand("2H 3H 4H 6H 5H")));
+        Assert.assertEquals(1, new PokerHand("QC JC TC 9C 8C").compareTo(new PokerHand("7H 6H TH 9H 8H")));
+    }
+
+    @Test
+    public void compareRoyalFlushCombinations() {
+        Assert.assertEquals(0, new PokerHand("AS KS QS JS TS").compareTo(new PokerHand("AD KD QD JD TD")));
+        Assert.assertEquals(0, new PokerHand("AH KH QH JH TH").compareTo(new PokerHand("AC KC QC JC TC")));
+        Assert.assertEquals(0, new PokerHand("AC KC QC JC TC").compareTo(new PokerHand("AS KS QS JS TS")));
+        Assert.assertEquals(0, new PokerHand("AD KD QD JD TD").compareTo(new PokerHand("AH KH QH JH TH")));
+    }
+
+    @Test
+    public void compareHighCardAndPair() {
+        Assert.assertEquals(-1, new PokerHand("3S 2H 5C JD TD").compareTo(new PokerHand("2H 3H 3S KD QS")));
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("AC AH JS 7C 4S")));
+    }
+
+    @Test
+    public void compareHighCardAndTwoPair() {
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("2S 3H 3C KD KH")));
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("AS AD QC QD 5H")));
+    }
+
+    @Test
+    public void compareHighCardAndThree() {
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("2S 3H KC KD KH")));
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("AS AC AD JH 4C")));
+    }
+
+    @Test
+    public void compareHighCardAndStraight() {
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("TS KH JD QC AD")));
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("AH KD QS JH TC")));
+    }
+
+    @Test
+    public void compareHighCardAndFlush() {
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("2C 3C AC 4C 5C")));
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("AD QD TD 7D 4D")));
+    }
+
+    @Test
+    public void compareHighCardAndFullHouse() {
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("2S 2H KC KH KD")));
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("AS AH AC QH QD")));
+    }
+
+    @Test
+    public void compareHighCardAndFour() {
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("2S KH KC KD KS")));
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("AS AH AC AD 5C")));
+    }
+
+    @Test
+    public void compareHighCardAndStraightFlush() {
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("TS JS 9S KS QS")));
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("KS QS JS TS 9S")));
+    }
+
+    @Test
+    public void compareHighCardAndRoyalFlush() {
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("TS JS AS KS QS")));
+        Assert.assertEquals(-1, new PokerHand("5D 2C TH JC QS").compareTo(new PokerHand("AS KS QS JS TS")));
+    }
+
+    @Test
+    public void comparePairAndTwoPair() {
+        Assert.assertEquals(-1, new PokerHand("2H 3H 3S KD QS").compareTo(new PokerHand("2S 3H 3C KD KH")));
+        Assert.assertEquals(-1, new PokerHand("8S 8C AD JD 9D").compareTo(new PokerHand("9H 9D 5D 5C KD")));
+    }
+
+    @Test
+    public void comparePairAndThree() {
+        Assert.assertEquals(-1, new PokerHand("2H 3H 3S KD QS").compareTo(new PokerHand("2S 3H KC KD KH")));
+        Assert.assertEquals(-1, new PokerHand("8S 8C AD JD 9D").compareTo(new PokerHand("QH QD QS AD 8D")));
+    }
+
+    @Test
+    public void comparePairAndStraight() {
+        Assert.assertEquals(-1, new PokerHand("2H 3H 3S KD QS").compareTo(new PokerHand("AH KD QS JH TC")));
+        Assert.assertEquals(-1, new PokerHand("8S 8C AD JD 9D").compareTo(new PokerHand("4C 5C 3H 2D 6H")));
+    }
+
+    @Test
+    public void comparePairAndFlush() {
+        Assert.assertEquals(-1, new PokerHand("2H 3H 3S KD QS").compareTo(new PokerHand("2C 3C AC 4C 5C")));
+        Assert.assertEquals(-1, new PokerHand("8S 8C AD JD 9D").compareTo(new PokerHand("TH 7H 4H 3H 2H")));
+    }
+
+    @Test
+    public void comparePairAndFullHouse() {
+        Assert.assertEquals(-1, new PokerHand("2H 3H 3S KD QS").compareTo(new PokerHand("2S 2H KC KH KD")));
+        Assert.assertEquals(-1, new PokerHand("8S 8C AD JD 9D").compareTo(new PokerHand("JD JC JS 2S 2H")));
+    }
+
+    @Test
+    public void comparePairAndFour() {
+        Assert.assertEquals(-1, new PokerHand("2H 3H 3S KD QS").compareTo(new PokerHand("2S KH KC KD KS")));
+        Assert.assertEquals(-1, new PokerHand("8S 8C AD JD 9D").compareTo(new PokerHand("AS AH AC AD 5C")));
+    }
+
+    @Test
+    public void comparePairAndStraightFlush() {
+        Assert.assertEquals(-1, new PokerHand("2H 3H 3S KD QS").compareTo(new PokerHand("TS JS 9S KS QS")));
+        Assert.assertEquals(-1, new PokerHand("8S 8C AD JD 9D").compareTo(new PokerHand("QC JC TC 9C 8C")));
+    }
+
+    @Test
+    public void comparePairAndRoyalFlush() {
+        Assert.assertEquals(-1, new PokerHand("2H 3H 3S KD QS").compareTo(new PokerHand("TS JS AS KS QS")));
+        Assert.assertEquals(-1, new PokerHand("8S 8C AD JD 9D").compareTo(new PokerHand("AC KC QC JC TC")));
+    }
+
+    @Test
+    public void compareTwoPairAndThree() {
+        Assert.assertEquals(-1, new PokerHand("AS AD QC QD 5H").compareTo(new PokerHand("AS AC AD JH 4C")));
+        Assert.assertEquals(-1, new PokerHand("6C 6H 2D 2C TC").compareTo(new PokerHand("9C 9S 9H KH 7C")));
+    }
+
+    @Test
+    public void compareTwoPairAndStraight() {
+        Assert.assertEquals(-1, new PokerHand("AS AD QC QD 5H").compareTo(new PokerHand("QD JC TH 9H 8S")));
+        Assert.assertEquals(-1, new PokerHand("6C 6H 2D 2C TC").compareTo(new PokerHand("4C 5C 3H 2D 6H")));
+    }
+
+    @Test
+    public void compareTwoPairAndFlush() {
+        Assert.assertEquals(-1, new PokerHand("AS AD QC QD 5H").compareTo(new PokerHand("2C 3C AC 4C 5C")));
+        Assert.assertEquals(-1, new PokerHand("6C 6H 2D 2C TC").compareTo(new PokerHand("TH 7H 4H 3H 2H")));
+    }
+
+    @Test
+    public void compareTwoPairAndFullHouse() {
+        Assert.assertEquals(-1, new PokerHand("AS AD QC QD 5H").compareTo(new PokerHand("JD JC JS 2S 2H")));
+        Assert.assertEquals(-1, new PokerHand("6C 6H 2D 2C TC").compareTo(new PokerHand("4H 4S 4D KS KH")));
+    }
+
+    @Test
+    public void compareTwoPairAndFour() {
+        Assert.assertEquals(-1, new PokerHand("AS AD QC QD 5H").compareTo(new PokerHand("2S KH KC KD KS")));
+        Assert.assertEquals(-1, new PokerHand("6C 6H 2D 2C TC").compareTo(new PokerHand("4S 4D 4H 4C TD")));
+    }
+
+    @Test
+    public void compareTwoPairAndStraightFlush() {
+        Assert.assertEquals(-1, new PokerHand("AS AD QC QD 5H").compareTo(new PokerHand("9H 8H 7H 6H 5H")));
+        Assert.assertEquals(-1, new PokerHand("6C 6H 2D 2C TC").compareTo(new PokerHand("5D 6D 4D 3D 2D")));
+    }
+
+    @Test
+    public void compareTwoPairAndRoyalFlush() {
+        Assert.assertEquals(-1, new PokerHand("AS AD QC QD 5H").compareTo(new PokerHand("AC KC QC JC TC")));
+        Assert.assertEquals(-1, new PokerHand("6C 6H 2D 2C TC").compareTo(new PokerHand("AC KC QC JC TC")));
+    }
+
+    @Test
+    public void compareThreeAndStraight() {
+        Assert.assertEquals(-1, new PokerHand("AS AC AD JH 4C").compareTo(new PokerHand("TS KH JD QC AD")));
+        Assert.assertEquals(-1, new PokerHand("2D 2S 2C JH TS").compareTo(new PokerHand("QD JC TH 9H 8S")));
+    }
+
+    @Test
+    public void compareThreeAndFlush() {
+        Assert.assertEquals(-1, new PokerHand("AS AC AD JH 4C").compareTo(new PokerHand("AD QD TD 7D 4D")));
+        Assert.assertEquals(-1, new PokerHand("2D 2S 2C JH TS").compareTo(new PokerHand("TH 7H 4H 3H 2H")));
+    }
+
+    @Test
+    public void compareThreeAndFullHouse() {
+        Assert.assertEquals(-1, new PokerHand("AS AC AD JH 4C").compareTo(new PokerHand("2S 2H KC KH KD")));
+        Assert.assertEquals(-1, new PokerHand("2D 2S 2C JH TS").compareTo(new PokerHand("TC TS TH AD AS")));
+    }
+
+    @Test
+    public void compareThreeAndFour() {
+        Assert.assertEquals(-1, new PokerHand("AS AC AD JH 4C").compareTo(new PokerHand("JS JC JD JH 9H")));
+        Assert.assertEquals(-1, new PokerHand("2D 2S 2C JH TS").compareTo(new PokerHand("7D 7S 7H 7C KD")));
+    }
+
+    @Test
+    public void compareThreeAndStraightFlush() {
+        Assert.assertEquals(-1, new PokerHand("AS AC AD JH 4C").compareTo(new PokerHand("TS JS 9S KS QS")));
+        Assert.assertEquals(-1, new PokerHand("2D 2S 2C JH TS").compareTo(new PokerHand("QC JC TC 9C 8C")));
+    }
+
+    @Test
+    public void compareThreeAndRoyalFlush() {
+        Assert.assertEquals(-1, new PokerHand("AS AC AD JH 4C").compareTo(new PokerHand("TS JS AS KS QS")));
+        Assert.assertEquals(-1, new PokerHand("2D 2S 2C JH TS").compareTo(new PokerHand("AC KC QC JC TC")));
+    }
+
+    @Test
+    public void compareStraightAndFlush() {
+
+    }
+
+    @Test
+    public void compareStraightAndFullHouse() {
+
+    }
+
+    @Test
+    public void compareStraightAndFour() {
+
+    }
+
+    @Test
+    public void compareStraightAndStraightFlush() {
+
+    }
+
+    @Test
+    public void compareStraightAndRoyalFlush() {
+
+    }
+
+    @Test
+    public void compareFlushAndFullHouse() {
+
+    }
+
+    @Test
+    public void compareFlushAndFour() {
+
+    }
+
+    @Test
+    public void compareFlushAndStraightFlush() {
+
+    }
+
+    @Test
+    public void compareFlushAndRoyalFlush() {
+
+    }
+
+    @Test
+    public void compareFullHouseAndFour() {
+
+    }
+
+    @Test
+    public void compareFullHouseAndStraightFlush() {
+
+    }
+
+    @Test
+    public void compareFullHouseAndRoyalFlush() {
+
+    }
+
+    @Test
+    public void compareFourAndStraightFlush() {
+
+    }
+
+    @Test
+    public void compareFourAndRoyalFlush() {
+
+    }
+
+    @Test
+    public void compareStraightFlushAndRoyalFlush() {
+
+    }
+
+
 }

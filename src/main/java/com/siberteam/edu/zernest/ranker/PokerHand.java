@@ -4,51 +4,54 @@ import java.util.*;
 
 public class PokerHand implements Comparable<PokerHand> {
     private final HandCombinations combination;
-    private final String hand;
     private final long sameCombinationScore;
+    private final List<Card> cardsList;
+    public String hand;///////////////
 
     public PokerHand(String hand) {
         this.hand = hand;
-        List<Card> cardsList = getCardsHand(hand);
-        List<Integer> ranks = getRanks(cardsList);
-        List<Integer> suits = getSuits(cardsList);
-        int maxDuplicatesCount = findMaxDuplicatesCount(ranks);
+        cardsList = getCardsFromString(hand);
 
-        combination = findCombination(isFlush(suits), isStraight(ranks), maxDuplicatesCount, ranks);
+        List<Rank> ranksList = getRanks(cardsList);
+        List<Suit> suitsList = getSuits(cardsList);
+        int maxDuplicatesCount = findMaxDuplicatesCount(ranksList);
 
-        sameCombinationScore = findSameCombinationScore(getRanksMap(ranks), maxDuplicatesCount);
+        combination = findCombination(isFlush(suitsList), isStraight(ranksList), maxDuplicatesCount, ranksList);
+
+        sameCombinationScore = findSameCombinationScore(getRanksMap(ranksList), maxDuplicatesCount);
     }
 
-    private List<Card> getCardsHand(String stringHand) {
+    private List<Card> getCardsFromString(String stringHand) {
         List<Card> cardsHand = new ArrayList<>();
         Arrays.stream(stringHand.split(" ")).forEach(s -> cardsHand.add(new Card(s)));
+        Collections.sort(cardsHand);
         return cardsHand;
     }
 
-    private List<Integer> getSuits(List<Card> cardsList) {
-        List<Integer> suits = new ArrayList<>();
-        cardsList.forEach(card -> suits.add(card.getSuit()));
+    private List<Suit> getSuits(List<Card> cardsList) {
+        List<Suit> suits = new ArrayList<>();
+        cardsList.forEach(card -> suits.add(card.getCardSuit()));
         return suits;
     }
 
-    private List<Integer> getRanks(List<Card> cardsList) {
-        List<Integer> ranks = new ArrayList<>();
-        cardsList.forEach(card -> ranks.add(card.getRank()));
+    private List<Rank> getRanks(List<Card> cardsList) {
+        List<Rank> ranks = new ArrayList<>();
+        cardsList.forEach(card -> ranks.add(card.getCardRank()));
         Collections.sort(ranks);
         return ranks;
     }
 
-    private Map<Integer, Integer> getRanksMap(List<Integer> ranks) {
+    private Map<Integer, Integer> getRanksMap(List<Rank> ranks) {
         Map<Integer, Integer> ranksMap = new LinkedHashMap<>();
-        ranks.forEach(rank -> ranksMap.merge(rank, 1, Integer::sum));
+        ranks.forEach(rank -> ranksMap.merge(rank.getValue(), 1, Integer::sum));
         return ranksMap;
     }
 
-    private boolean isStraight(List<Integer> ranks) {
+    private boolean isStraight(List<Rank> ranks) {
         boolean straight = true;
 
         for (int i = 1; i < ranks.size(); i++) {
-            if (!ranks.get(i).equals(ranks.get(i - 1) + 1)) {
+            if (ranks.get(i).getValue() != ranks.get(i - 1).getValue() + 1) {
                 straight = false;
                 break;
             }
@@ -57,32 +60,32 @@ public class PokerHand implements Comparable<PokerHand> {
         return straight;
     }
 
-    private boolean isFlush(List<Integer> suits) {
+    private boolean isFlush(List<Suit> suits) {
         return suits.stream().allMatch(suits.get(0)::equals);
     }
 
-    private int findMaxDuplicatesCount(List<Integer> values) {
-        int last = values.get(0);
+    private int findMaxDuplicatesCount(List<Rank> values) {
+        int last = values.get(0).getValue();
         int max = 0;
         int current = 1;
 
         for (int i = 1; i < values.size(); i++) {
-            if (values.get(i) == last) {
+            if (values.get(i).getValue() == last) {
                 current++;
             } else {
                 max = Math.max(max, current);
                 current = 1;
             }
-            last = values.get(i);
+            last = values.get(i).getValue();
         }
 
         return Math.max(max, current);
     }
 
     private HandCombinations findCombination(boolean flush, boolean straight, int maxDuplicatesCount,
-                                             List<Integer> values) {
+                                             List<Rank> values) {
         if (flush && straight) {
-            return values.contains(Card.getRank('A')) ? HandCombinations.ROYAL_FLUSH
+            return values.contains(Rank.ACE) ? HandCombinations.ROYAL_FLUSH
                     : HandCombinations.STRAIGHT_FLUSH;
         } else if (flush) {
             return HandCombinations.FLUSH;
@@ -135,19 +138,11 @@ public class PokerHand implements Comparable<PokerHand> {
         return combination;
     }
 
-    public String getHand() {
-        return hand;
-    }
-
-    public long getSameCombinationScore() {
-        return sameCombinationScore;
-    }
-
     @Override
     public int compareTo(PokerHand o) {
         int combinationComparing = Integer.compare(combination.getScore(), o.combination.getScore());
 
-        return combinationComparing == 0 ? Long.compare(getSameCombinationScore(), o.getSameCombinationScore())
+        return combinationComparing == 0 ? Long.compare(sameCombinationScore, o.sameCombinationScore)
                 : combinationComparing;
     }
 
@@ -156,20 +151,22 @@ public class PokerHand implements Comparable<PokerHand> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PokerHand hand = (PokerHand) o;
-        return sameCombinationScore == hand.sameCombinationScore && combination == hand.combination;
+        return sameCombinationScore == hand.sameCombinationScore
+                && combination == hand.combination
+                && cardsList.equals(hand.cardsList);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(combination, sameCombinationScore);
+        return Objects.hash(combination, sameCombinationScore, cardsList);
     }
 
     @Override
     public String toString() {
         return "PokerHand" + "[" +
                 "combination=" + combination +
-                ", hand='" + hand + '\'' +
                 ", sameCombinationScore=" + sameCombinationScore +
+                ", cardsList=" + cardsList +
                 ']';
     }
 }

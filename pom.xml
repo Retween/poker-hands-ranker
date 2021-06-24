@@ -32,9 +32,9 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>dependencies</classpathPrefix>
-                            <mainClass>
-                                com.siberteam.edu.zernest.ranker.Test.Main
-                            </mainClass>
+<!--                            <mainClass>-->
+<!--                                com.siberteam.edu.zernest.ranker.Test.Main-->
+<!--                            </mainClass>-->
                         </manifest>
                     </archive>
                     <finalName>poker-hands-ranker</finalName>

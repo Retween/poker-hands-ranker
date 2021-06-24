@@ -1,39 +1,62 @@
 package com.siberteam.edu.zernest.ranker;
 
-public class Card {
-    public final static String RANKS = "23456789TJQKA";
-    public final static String SUITS = "SHDC";
-    private final static int ADDITION = 10;
+import java.util.Objects;
 
-    private final int rank;
-    private final int suit;
+public class Card implements Comparable<Card> {
+    private final Rank cardRank;
+    private final Suit cardSuit;
 
     public Card(String card) {
-        rank = RANKS.indexOf(card.charAt(0));
-        suit = SUITS.indexOf(card.charAt(1));
-        if (rank == -1 || suit == -1 || card.length() != 2) {
+        cardRank = Rank.getRank(card.charAt(0));
+        cardSuit = Suit.getSuit(card.charAt(1));
+        if (cardRank == null || cardSuit == null || card.length() != 2) {
             throw new IllegalArgumentException("Invalid card: " + card);
         }
     }
 
-    public static int getRank(char rank) {
-        int result = RANKS.indexOf(rank);
-        return (result == -1) ? -1 : result + ADDITION;
+    public Card(Rank cardRank, Suit cardSuit) {
+        this.cardRank = cardRank;
+        this.cardSuit = cardSuit;
+        if (cardRank == null || cardSuit == null) {
+            throw new IllegalArgumentException("Invalid card: " + cardRank + " " + cardSuit);
+        }
     }
 
-    public int getRank() {
-        return rank + ADDITION;
+    public Rank getCardRank() {
+        return cardRank;
     }
 
-    public int getSuit() {
-        return suit;
+    public Suit getCardSuit() {
+        return cardSuit;
+    }
+
+    private int getComparisonNumber() {
+        return cardRank.ordinal() + (cardSuit.ordinal() + 1) * 100;
+    }
+
+    @Override
+    public int compareTo(Card o) {
+        return Integer.compare(getComparisonNumber(), o.getComparisonNumber());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Card card = (Card) o;
+        return getComparisonNumber() == card.getComparisonNumber();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cardRank, cardSuit);
     }
 
     @Override
     public String toString() {
         return "Card" + "[" +
-                "rank=" + rank +
-                ", suit=" + suit +
+                "cardRank=" + cardRank +
+                ", cardSuit=" + cardSuit +
                 ']';
     }
 }
