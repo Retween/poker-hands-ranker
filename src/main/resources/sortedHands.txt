@@ -17,5 +17,6 @@ JH 3H AH 8H TH: Flush
 AD 2D 3D QD KD: Flush
 AS JH JC JD JS: Four
 2S KH KC KD KS: Four
+TS JS 9S 8S QS: StraightFlush
 TS JS 9S KS QS: StraightFlush
 TS JS AS KS QS: RoyalFlush
