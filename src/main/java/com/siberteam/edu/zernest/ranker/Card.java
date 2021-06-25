@@ -44,7 +44,7 @@ public class Card implements Comparable<Card> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Card card = (Card) o;
-        return getComparisonNumber() == card.getComparisonNumber();
+        return cardRank == card.cardRank && cardSuit == card.cardSuit;
     }
 
     @Override

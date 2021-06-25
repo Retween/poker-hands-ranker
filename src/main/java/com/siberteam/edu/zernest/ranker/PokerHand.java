@@ -6,35 +6,32 @@ public class PokerHand implements Comparable<PokerHand> {
     private final HandCombinations combination;
     private final long sameCombinationScore;
     private final List<Card> cardsList;
-    public String hand;///////////////
 
     public PokerHand(String hand) {
-        this.hand = hand;
-        cardsList = getCardsFromString(hand);
+        cardsList = getCardsListFromString(hand);
 
-        List<Rank> ranksList = getRanks(cardsList);
-        List<Suit> suitsList = getSuits(cardsList);
+        List<Rank> ranksList = getRanksListFromCardsList(cardsList);
         int maxDuplicatesCount = findMaxDuplicatesCount(ranksList);
 
-        combination = findCombination(isFlush(suitsList), isStraight(ranksList), maxDuplicatesCount, ranksList);
+        combination = findCombination(ranksList, getSuitsListFromCardsList(cardsList), maxDuplicatesCount);
 
         sameCombinationScore = findSameCombinationScore(getRanksMap(ranksList), maxDuplicatesCount);
     }
 
-    private List<Card> getCardsFromString(String stringHand) {
+    private List<Card> getCardsListFromString(String stringHand) {
         List<Card> cardsHand = new ArrayList<>();
         Arrays.stream(stringHand.split(" ")).forEach(s -> cardsHand.add(new Card(s)));
         Collections.sort(cardsHand);
         return cardsHand;
     }
 
-    private List<Suit> getSuits(List<Card> cardsList) {
+    private List<Suit> getSuitsListFromCardsList(List<Card> cardsList) {
         List<Suit> suits = new ArrayList<>();
         cardsList.forEach(card -> suits.add(card.getCardSuit()));
         return suits;
     }
 
-    private List<Rank> getRanks(List<Card> cardsList) {
+    private List<Rank> getRanksListFromCardsList(List<Card> cardsList) {
         List<Rank> ranks = new ArrayList<>();
         cardsList.forEach(card -> ranks.add(card.getCardRank()));
         Collections.sort(ranks);
@@ -45,23 +42,6 @@ public class PokerHand implements Comparable<PokerHand> {
         Map<Integer, Integer> ranksMap = new LinkedHashMap<>();
         ranks.forEach(rank -> ranksMap.merge(rank.getValue(), 1, Integer::sum));
         return ranksMap;
-    }
-
-    private boolean isStraight(List<Rank> ranks) {
-        boolean straight = true;
-
-        for (int i = 1; i < ranks.size(); i++) {
-            if (ranks.get(i).getValue() != ranks.get(i - 1).getValue() + 1) {
-                straight = false;
-                break;
-            }
-        }
-
-        return straight;
-    }
-
-    private boolean isFlush(List<Suit> suits) {
-        return suits.stream().allMatch(suits.get(0)::equals);
     }
 
     private int findMaxDuplicatesCount(List<Rank> values) {
@@ -82,20 +62,21 @@ public class PokerHand implements Comparable<PokerHand> {
         return Math.max(max, current);
     }
 
-    private HandCombinations findCombination(boolean flush, boolean straight, int maxDuplicatesCount,
-                                             List<Rank> values) {
-        if (flush && straight) {
-            return values.contains(Rank.ACE) ? HandCombinations.ROYAL_FLUSH
-                    : HandCombinations.STRAIGHT_FLUSH;
-        } else if (flush) {
-            return HandCombinations.FLUSH;
-        } else if (straight) {
-            return HandCombinations.STRAIGHT;
-        }
-
-        switch ((int) values.stream().distinct().count()) {
+    private HandCombinations findCombination(List<Rank> ranks, List<Suit> suits, int maxDuplicatesCount) {
+        switch ((int) ranks.stream().distinct().count()) {
             case 5:
-                return HandCombinations.HIGH_CARD;
+                boolean straight = ranks.get(4).getValue() - ranks.get(0).getValue() == 4;
+                boolean flush = suits.stream().allMatch(suits.get(0)::equals);
+                if (flush && straight) {
+                    return ranks.contains(Rank.ACE) ? HandCombinations.ROYAL_FLUSH
+                            : HandCombinations.STRAIGHT_FLUSH;
+                } else if (flush) {
+                    return HandCombinations.FLUSH;
+                } else if (straight) {
+                    return HandCombinations.STRAIGHT;
+                } else {
+                    return HandCombinations.HIGH_CARD;
+                }
             case 4:
                 return HandCombinations.PAIR;
             case 3:
@@ -136,6 +117,10 @@ public class PokerHand implements Comparable<PokerHand> {
 
     public HandCombinations getCombination() {
         return combination;
+    }
+
+    public List<Card> getCardsList() {
+        return cardsList;
     }
 
     @Override
