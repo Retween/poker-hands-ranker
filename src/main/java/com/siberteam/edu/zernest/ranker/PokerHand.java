@@ -15,7 +15,7 @@ public class PokerHand implements Comparable<PokerHand> {
 
         combination = findCombination(ranksList, getSuitsListFromCardsList(cardsList), maxDuplicatesCount);
 
-        sameCombinationScore = findSameCombinationScore(getRanksMap(ranksList), maxDuplicatesCount);
+        sameCombinationScore = findSameCombinationScore(getRanksFrequencyMap(ranksList), maxDuplicatesCount);
     }
 
     private List<Card> getCardsListFromString(String stringHand) {
@@ -38,7 +38,7 @@ public class PokerHand implements Comparable<PokerHand> {
         return ranks;
     }
 
-    private Map<Integer, Integer> getRanksMap(List<Rank> ranks) {
+    private Map<Integer, Integer> getRanksFrequencyMap(List<Rank> ranks) {
         Map<Integer, Integer> ranksMap = new LinkedHashMap<>();
         ranks.forEach(rank -> ranksMap.merge(rank.getValue(), 1, Integer::sum));
         return ranksMap;
